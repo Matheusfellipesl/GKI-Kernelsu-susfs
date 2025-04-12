@@ -142,7 +142,7 @@ jobs:
     - name: Apply patch_linux and replace Image
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
-        curl -LO https://raw.githubusercontent.com/izsdeaman97/GKI-Kernelsu-susfs/main/patch_linux
+        curl -LO https://raw.githubusercontent.com/Matheusfellipesl/GKI-Kernelsu-susfs/main/patch_linux
         chmod +x patch_linux
         ./patch_linux
         rm -f Image
