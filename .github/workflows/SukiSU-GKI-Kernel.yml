@@ -24,52 +24,35 @@ jobs:
         sudo mkdir -p /mnt/kernel_workspace
         sudo chmod 0777 /mnt/kernel_workspace
         cd /mnt/kernel_workspace
-
     - name: Clone OnePlus 9 Kernel Source
       run: |
         git clone --single-branch --branch oneplus/sm8350_t_13.0.0_op9 https://github.com/OnePlusOSS/android_kernel_oneplus_sm8350.git
         cd android_kernel_oneplus_sm8350
-
-    - name: Verify drivers directory
-      run: |
-        cd /mnt/kernel_workspace/android_kernel_oneplus_sm8350
-        if [ ! -d "drivers" ]; then
-          echo "ERROR: 'drivers/' directory not found!"
-          exit 1
-        fi
-        echo "'drivers/' directory exists!"
-
-    - name: List directory structure
-      run: |
-        cd /mnt/kernel_workspace/android_kernel_oneplus_sm8350
-        find . -type d
-
-    - name: Add KernelSU (if drivers/ directory exists)
+        
+    - name: KernelSU / SUSFS / Misc
+      working-dictionary: android_kernel_oneplus_sm8350
       run: |
         echo "Add KernelSU"
-        if [ -d "/mnt/kernel_workspace/android_kernel_oneplus_sm8350/drivers" ]; then
-          curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-dev
-        else
-          echo "Skipping KernelSU setup, drivers directory not found"
-        fi
+        curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-dev
 
+          
     - name: Apply SUSFS Patches
       run: |
         echo "Changing to configuration directory: /mnt/kernel_workspace..."
         cd "/mnt/kernel_workspace"
         echo "Applying SUSFS patches..."
-        git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android14-6.1
+           
+        git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android11-5.4
         cd KernelSU
         cd -
         echo "apply patch"
-        cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch /mnt/kernel_workspace/common/
+        cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/50_add_susfs_in_gki-android11-5.4.patch /mnt/kernel_workspace/common/
         cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/next_hooks.patch /mnt/kernel_workspace/common/
         cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/fs/* /mnt/kernel_workspace/common/fs/
         cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/include/linux/* /mnt/kernel_workspace/common/include/linux/
         cd /mnt/kernel_workspace/common
-        patch -p1 < 50_add_susfs_in_gki-android14-6.1.patch || true
+        patch -p1 < 50_add_susfs_in_gki-android11-5.4.patch || true
         patch -p1 -F 3 < next_hooks.patch || true
-
     - name: Apply Hide Stuff Patches
       run: |
           # Apply additional patch
@@ -105,11 +88,9 @@ jobs:
           echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./common/arch/arm64/configs/gki_defconfig
-
           # Add additional tmpfs config setting
           echo "CONFIG_TMPFS_XATTR=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./common/arch/arm64/configs/gki_defconfig
-
           # Add additional config setting
           echo "CONFIG_IP_NF_TARGET_TTL=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_IP6_NF_TARGET_HL=y" >> ./common/arch/arm64/configs/gki_defconfig
@@ -127,7 +108,6 @@ jobs:
           # Add bbrv3 config setting
           cd "/mnt/kernel_workspace/common"
           #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/modules.bzl /mnt/kernel_workspace/common/
-
           cd ..
           echo "CONFIG_TCP_CONG_ADVANCED=y" >> ./common/arch/arm64/configs/gki_defconfig 
           echo "CONFIG_TCP_CONG_BBR=y" >> ./common/arch/arm64/configs/gki_defconfig
@@ -153,7 +133,6 @@ jobs:
         ./patch_linux
         rm -f Image
         mv oImage Image
-
     - name: Make Anykernel3
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
