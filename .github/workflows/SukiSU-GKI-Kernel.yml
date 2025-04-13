@@ -30,7 +30,7 @@ jobs:
         cd android_kernel_oneplus_sm8350
         
     - name: KernelSU / SUSFS / Misc
-      working-dictionary: android_kernel_oneplus_sm8350
+      working-directory: android_kernel_oneplus_sm8350
       run: |
         echo "Add KernelSU"
         curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-dev
