@@ -39,7 +39,7 @@ jobs:
     - name: Apply SUSFS Patches
       run: |
         echo "Changing to configuration directory: /mnt/kernel_workspace..."
-        cd "/mnt/kernel_workspace"
+
         echo "Applying SUSFS patches..."
            
         git clone https://gitlab.com/simonpunk/susfs4ksu.git -b kernel-5.4
