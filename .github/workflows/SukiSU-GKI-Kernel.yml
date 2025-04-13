@@ -38,21 +38,17 @@ jobs:
           
     - name: Apply SUSFS Patches
       run: |
-        echo "Changing to configuration directory: /mnt/kernel_workspace..."
+         echo "Applying SUSFS patches..."
+         git clone https://gitlab.com/simonpunk/susfs4ksu.git -b kernel-5.4
+         cd android_kernel_oneplus_sm8350
+         echo "apply patch"
+         cp ../susfs4ksu/kernel_patches/50_add_susfs_in_kernel-5.4.patch ./
+         #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/next_hooks.patch ./ #not found. if you don't know, remove this line at first
+         cp ../susfs4ksu/kernel_patches/fs/* ./fs/
+         cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
+         patch -p1 < 50_add_susfs_in kernel-5.4.patch || true
+         # patch -p1 -F 3 < next_hooks.patch || true #not found. if you don't know, remove this line at first
 
-        echo "Applying SUSFS patches..."
-           
-        git clone https://gitlab.com/simonpunk/susfs4ksu.git -b kernel-5.4
-        cd KernelSU
-        cd -
-        echo "apply patch"
-        cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/50_add_susfs_in_kernel-5.4.patch /mnt/kernel_workspace/common/
-        cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/next_hooks.patch /mnt/kernel_workspace/common/
-        cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/fs/* /mnt/kernel_workspace/common/fs/
-        cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/include/linux/* /mnt/kernel_workspace/common/include/linux/
-        cd /mnt/kernel_workspace/common
-        patch -p1 < 50_add_susfs_in_kernel-5.4.patch || true
-        patch -p1 -F 3 < next_hooks.patch || true
     - name: Apply Hide Stuff Patches
       run: |
           # Apply additional patch
