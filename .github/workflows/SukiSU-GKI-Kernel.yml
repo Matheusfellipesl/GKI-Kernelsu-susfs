@@ -29,7 +29,7 @@ jobs:
     - name: Download source code
       run: |
         cd /mnt/kernel_workspace
-        repo init --depth=1 --u https://android.googlesource.com/kernel/manifest -b common-android14-5.15-2025-03
+        repo init --depth=1 --u https://android.googlesource.com/kernel/manifest -b common-android14-5.15-2024-06
         repo --trace sync -c -j$(nproc --all) --no-tags --fail-fast
 
     - name: KernelSU / SUSFS / Misc
@@ -44,7 +44,7 @@ jobs:
         cd "/mnt/kernel_workspace"
         echo "Applying SUSFS patches..."
            
-        git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android14-6.1
+        git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android14-5.15
         #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch ./KernelSU/
         #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/apk_sign.c_fix.patch ./KernelSU/
         #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/mksu_susfs.patch ./KernelSU/
@@ -54,14 +54,14 @@ jobs:
         #patch -p1 < apk_sign.c_fix.patch || true
         #patch -p1 < mksu_susfs.patch || true
         #patch -p1 < mksu.fix.patch || true
-        cd -
+        cd - 
         echo "apply patch"
-        cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch /mnt/kernel_workspace/common/
+        cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-5.15.patch /mnt/kernel_workspace/common/
         cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/next_hooks.patch /mnt/kernel_workspace/common/
         cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/fs/* /mnt/kernel_workspace/common/fs/
         cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/include/linux/* /mnt/kernel_workspace/common/include/linux/
         cd /mnt/kernel_workspace/common
-        patch -p1 < 50_add_susfs_in_gki-android14-6.1.patch || true
+        patch -p1 < 50_add_susfs_in_gki-android14-5.15.patch || true
         patch -p1 -F 3 < next_hooks.patch || true
 
     - name: Apply Hide Stuff Patches
@@ -90,7 +90,7 @@ jobs:
           echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_KSU_DEFAULT_MOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_AUTO_ADD_SUS_BIND_MOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_SUS_KSTAT=y" >> ./common/arch/arm64/configs/gki_defconfig
-          echo "CONFIG_KSU_SUSFS_SUS_OVERLAYFS=n" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_SUSFS_OVERLAYFS=n" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_TRY_UMOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_AUTO_ADD_TRY_UMOUNT_FOR_BIND_MOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_SPOOF_UNAME=y" >> ./common/arch/arm64/configs/gki_defconfig
@@ -133,11 +133,11 @@ jobs:
     - name: Build Kernel
       run: |
         cd /mnt/kernel_workspace
-          rm -rf ./common/android/abi_gki_protected_exports_*
-            sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
-            tools/bazel build --config=fast --stamp //common:kernel_aarch64_dist
-            cp ./bazel-bin/common/kernel_aarch64/Image $GITHUB_WORKSPACE/kernel_workspace/
-            cp ./bazel-bin/common/kernel_aarch64/Image.lz4 $GITHUB_WORKSPACE/kernel_workspace/
+        rm -rf ./common/android/abi_gki_protected_exports_*
+        sed -i "/stable_scmversion_cmd/s/-maybe-dirty//g" ./build/kernel/kleaf/impl/stamp.bzl
+        tools/bazel build --config=fast --stamp //common:kernel_aarch64_dist
+        cp ./bazel-bin/common/kernel_aarch64/Image $GITHUB_WORKSPACE/kernel_workspace/
+        cp ./bazel-bin/common/kernel_aarch64/Image.lz4 $GITHUB_WORKSPACE/kernel_workspace/
          
     - name: Apply patch_linux and replace Image
       run: |
