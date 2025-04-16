@@ -30,7 +30,7 @@ jobs:
         cd Xiaomi_Kernel_OpenSource
         
     - name: KernelSU / SUSFS / Misc
-      working-directory: android_kernel_oneplus_sm8350
+      working-directory: Xiaomi_Kernel_OpenSource
       run: |
         echo "Add KernelSU"
         curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-dev
@@ -39,14 +39,14 @@ jobs:
     - name: Apply SUSFS Patches
       run: |
          echo "Applying SUSFS patches..."
-         git clone https://gitlab.com/simonpunk/susfs4ksu.git -b kernel-5.4
-         cd android_kernel_oneplus_sm8350
+         git clone https://gitlab.com/simonpunk/susfs4ksu.git -b kernel-4.19
+         cd Xiaomi_Kernel_OpenSource
          echo "apply patch"
-         cp ../susfs4ksu/kernel_patches/50_add_susfs_in_kernel-5.4.patch ./
+         cp ../susfs4ksu/kernel_patches/50_add_susfs_in_kernel-4.19.patch ./
          #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/next_hooks.patch ./ #not found. if you don't know, remove this line at first
          cp ../susfs4ksu/kernel_patches/fs/* ./fs/
          cp ../susfs4ksu/kernel_patches/include/linux/* ./include/linux/
-         patch -p1 < 50_add_susfs_in kernel-5.4.patch || true
+         patch -p1 < 50_add_susfs_in kernel-4.19.patch || true
          # patch -p1 -F 3 < next_hooks.patch || true #not found. if you don't know, remove this line at first
 
     - name: Apply Hide Stuff Patches
@@ -144,5 +144,5 @@ jobs:
     - name: Upload AnyKernel3
       uses: actions/upload-artifact@v4
       with:
-        name: AK3-${{ env.BUILD_TIME }}
+        name: Anykernel3-${{ env.BUILD_TIME }}
         path: kernel_workspace/AnyKernel3/*
