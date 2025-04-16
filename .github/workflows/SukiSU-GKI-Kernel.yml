@@ -24,10 +24,10 @@ jobs:
         sudo mkdir -p /mnt/kernel_workspace
         sudo chmod 0777 /mnt/kernel_workspace
         cd /mnt/kernel_workspace
-    - name: Clone OnePlus 9 Kernel Source
+    - name: Clone Mi 10S source
       run: |
-        git clone --single-branch --branch oneplus/sm8350_t_13.0.0_op9 https://github.com/OnePlusOSS/android_kernel_oneplus_sm8350.git
-        cd android_kernel_oneplus_sm8350
+        git clone --single-branch --branch alioth-r-oss https://github.com/MiCode/Xiaomi_Kernel_OpenSource.git
+        cd Xiaomi_Kernel_OpenSource
         
     - name: KernelSU / SUSFS / Misc
       working-directory: android_kernel_oneplus_sm8350
