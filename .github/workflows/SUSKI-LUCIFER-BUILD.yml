@@ -35,7 +35,7 @@ jobs:
     - name: KernelSU / SUSFS / Misc
       run: |
         cd /mnt/kernel_workspace
-        echo "Add KernelSU"
+        echo "Add Sukisu Ultra"
         curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-dev
           
     - name: Apply SUSFS Patches
