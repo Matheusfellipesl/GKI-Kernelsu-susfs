@@ -1,4 +1,4 @@
-name: Build Kernel-Next with GKI
+name: Build Kernel-SukiSU with GKI
 on:
   workflow_dispatch:
 
@@ -45,24 +45,24 @@ jobs:
         echo "Applying SUSFS patches..."
            
         git clone https://gitlab.com/simonpunk/susfs4ksu.git -b gki-android14-6.1
-        cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch ./KernelSU/
-        cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/apk_sign.c_fix.patch ./KernelSU/
+        #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch ./KernelSU/
+        #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/apk_sign.c_fix.patch ./KernelSU/
         #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/mksu_susfs.patch ./KernelSU/
         #cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/mksu.fix.patch ./KernelSU/
         cd KernelSU
-        patch -p1 < kernel-patch-susfs-v1.5.7-to-KernelSU-Next.patch || true
-        patch -p1 < apk_sign.c_fix.patch || true
+        #patch -p1 < 0001-kernel-patch-susfs-v1.5.5-to-KernelSU-Next-v1.0.5.patch || true
+        #patch -p1 < apk_sign.c_fix.patch || true
         #patch -p1 < mksu_susfs.patch || true
         #patch -p1 < mksu.fix.patch || true
         cd -
         echo "apply patch"
         cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/50_add_susfs_in_gki-android14-6.1.patch /mnt/kernel_workspace/common/
-        cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/syscall_hooks.patch /mnt/kernel_workspace/common/
+        cp /mnt/kernel_workspace/GKI-Kernelsu-susfs/patches/next_hooks.patch /mnt/kernel_workspace/common/
         cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/fs/* /mnt/kernel_workspace/common/fs/
         cp /mnt/kernel_workspace/susfs4ksu/kernel_patches/include/linux/* /mnt/kernel_workspace/common/include/linux/
         cd /mnt/kernel_workspace/common
         patch -p1 < 50_add_susfs_in_gki-android14-6.1.patch || true
-        patch -p1 -F 3 < syscall_hooks.patch || true
+        patch -p1 -F 3 < next_hooks.patch || true
 
     - name: Apply Hide Stuff Patches
       run: |
@@ -80,6 +80,8 @@ jobs:
           echo "Adding configuration settings to gki_defconfig..."
         
           echo "CONFIG_KSU=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KPM=y" >> ./common/arch/arm64/configs/gki_defconfig
+          echo "CONFIG_KSU_MANUAL_HOOK=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_WITH_KPROBES=n" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_HAS_MAGIC_MOUNT=y" >> ./common/arch/arm64/configs/gki_defconfig
@@ -136,6 +138,15 @@ jobs:
             tools/bazel build --config=fast --stamp //common:kernel_aarch64_dist
             cp ./bazel-bin/common/kernel_aarch64/Image $GITHUB_WORKSPACE/kernel_workspace/
             cp ./bazel-bin/common/kernel_aarch64/Image.lz4 $GITHUB_WORKSPACE/kernel_workspace/
+         
+    - name: Apply patch_linux and replace Image
+      run: |
+        cd $GITHUB_WORKSPACE/kernel_workspace
+        curl -LO https://raw.githubusercontent.com/izsdeaman97/GKI-Kernelsu-susfs/main/patch_linux
+        chmod +x patch_linux
+        ./patch_linux
+        rm -f Image
+        mv oImage Image
 
     - name: Make Anykernel3
       run: |
