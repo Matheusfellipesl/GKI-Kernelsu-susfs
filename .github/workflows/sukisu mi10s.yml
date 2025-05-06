@@ -1,4 +1,4 @@
-name: Build Kernel-SukiSU with GKI
+name: NEW COPY
 on:
   workflow_dispatch:
 
@@ -36,7 +36,7 @@ jobs:
       run: |
         cd /mnt/kernel_workspace
         echo "Add KernelSU"
-        curl -LSs "https://raw.githubusercontent.com/rsuntk/KernelSU/main/kernel/setup.sh" | bash -s main
+        curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash -s susfs-dev
           
     - name: Apply SUSFS Patches
       run: |
