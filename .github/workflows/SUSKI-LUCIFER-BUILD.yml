@@ -24,7 +24,7 @@ jobs:
         sudo mkdir -p /mnt/kernel_workspace
         sudo chmod 0777 /mnt/kernel_workspace
         cd /mnt/kernel_workspace
-        git clone https://github.com/izsdeaman97/GKI-Kernelsu-susfs --depth=1
+        git clone https://github.com/Matheusfellipesl/GKI-Kernelsu-susfs --depth=1
 
     - name: Download source code
       run: |
@@ -142,7 +142,7 @@ jobs:
     - name: Apply patch_linux and replace Image
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
-        curl -LO https://raw.githubusercontent.com/izsdeaman97/GKI-Kernelsu-susfs/main/patch_linux
+        curl -LO https://raw.githubusercontent.com/Matheusfellipesl/GKI-Kernelsu-susfs/main/patch_linux
         chmod +x patch_linux
         ./patch_linux
         rm -f Image
